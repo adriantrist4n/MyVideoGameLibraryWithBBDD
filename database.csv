@@ -1,1 +1,3 @@
-Id,Name,Platform,hours,progress,pos,erased
+ID,name,platform,hours,progress,posFile,erased
+1,Marvel Spiderman,PC,23,90%,-1,True
+1,Elden Ring,PC,100,59%,-1,True

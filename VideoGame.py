@@ -10,7 +10,7 @@ class VideoGame:
     }
 
     # El método __init__ es llamado al crear el objeto
-    def __init__(self, ID, name, platform, hours, progress, posFile):
+    def __init__(self, ID, name, platform, hours, progress, posFile, erased=False):
         # Atributos de instancia
         self.ID = ID
         self.name = name
@@ -18,7 +18,7 @@ class VideoGame:
         self.hours = hours
         self.progress = progress
         self.posFile = posFile
-        self.erased = False
+        self.erased = erased
 
     def __eq__(self, oC):
         return oC.posFile == self.posFile
@@ -35,3 +35,4 @@ class VideoGame:
         self.platform = platform
         self.hours = hours
         self.progress = progress
+
