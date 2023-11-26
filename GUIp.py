@@ -17,118 +17,119 @@ import operator
 import pandas as pd
 
 # List that will store VideoGame objects read from the CSV file
-lVideoGame = []
+l_video_game = []
 
 # Definition of regular expression patterns for validation
-pattern_ID = r"\d{3}"
+pattern_id = r"\d{3}"
 pattern_platform = r"^[A-Z]+$"
 pattern_progress = r"\d+%$"
 
 # Function to add a new video game to the list and save the data to a CSV file
-def addVideoGame(l_VideoGame, t_VideogameInterfaz, oVideoGame, window):
-    saveVideoGame('database.csv', oVideoGame)
-    l_VideoGame.append(oVideoGame)  # Add the VideoGame object to the list
-    t_VideogameInterfaz.append([oVideoGame.ID, oVideoGame.name, oVideoGame.platform, oVideoGame.hours, oVideoGame.progress,
-                                oVideoGame.posFile, oVideoGame.erased])
-    window['-Table-'].update(values=t_VideogameInterfaz)
+def add_video_game(l_video_game, t_video_game_interface, o_video_game, window):
+    save_video_game('database.csv', o_video_game)
+    l_video_game.append(o_video_game)  # Add the VideoGame object to the list
+    o_video_game.pos_file = len(l_video_game) - 1
+    t_video_game_interface.append([o_video_game.id, o_video_game.name, o_video_game.platform, o_video_game.hours, o_video_game.progress,
+                                   o_video_game.pos_file, o_video_game.erased])
+    window['-Table-'].update(values=t_video_game_interface)
 
 # Function to delete a video game from the list and update the interface and CSV file
-def delVideoGame(l_VideoGame, t_VideogameInterfaz, posinTable):
+def del_video_game(l_video_game, t_video_game_interface, pos_in_table):
     # Read the CSV file and store the data in a DataFrame
     df = pd.read_csv('database.csv')
 
     # Find the row that has the same ID as the video game to be deleted
-    mask = df['ID'] == t_VideogameInterfaz[posinTable][0]
+    mask = df['id'] == t_video_game_interface[pos_in_table][0]
 
-    # If such a row is found, change the value of 'erase' to True
+    # If such a row is found, change the value of 'erased' to True
     df.loc[mask, 'erased'] = True
 
     # Save the DataFrame back to the CSV file
     df.to_csv('database.csv', index=False)
 
     # Update the list of video games in memory
-    for o in l_VideoGame:
-        if o.ID == t_VideogameInterfaz[posinTable][0]:
+    for o in l_video_game:
+        if o.id == t_video_game_interface[pos_in_table][0]:
             o.erased = True
             break
 
     # Remove the video game from the interface's list
-    t_VideogameInterfaz.remove(t_VideogameInterfaz[posinTable])
+    t_video_game_interface.remove(t_video_game_interface[pos_in_table])
 
 # Function to update a video game in the list and the CSV file
-def updateVideoGame(l_VideoGame, t_row_VideogameInterfaz, posinFile):
+def update_video_game(l_video_game, t_row_video_game_interface, pos_in_file):
     # Read the CSV file and store the data in a DataFrame
     df = pd.read_csv('database.csv')
 
     # Convert the ID to string before comparison
-    game_id = str(t_row_VideogameInterfaz[0])
-    df['ID'] = df['ID'].astype(str)
+    game_id = str(t_row_video_game_interface[0])
+    df['id'] = df['id'].astype(str)
 
     # Find the row that has the same ID as the video game to be updated
-    mask = df['ID'] == game_id
+    mask = df['id'] == game_id
 
     # If such a row is found, update the values of that row with the new values of the video game
     if df.loc[mask].shape[0] > 0:
-        df.loc[mask, 'name'] = t_row_VideogameInterfaz[1]
-        df.loc[mask, 'platform'] = t_row_VideogameInterfaz[2]
-        df.loc[mask, 'hours'] = t_row_VideogameInterfaz[3]
-        df.loc[mask, 'progress'] = t_row_VideogameInterfaz[4]
+        df.loc[mask, 'name'] = t_row_video_game_interface[1]
+        df.loc[mask, 'platform'] = t_row_video_game_interface[2]
+        df.loc[mask, 'hours'] = t_row_video_game_interface[3]
+        df.loc[mask, 'progress'] = t_row_video_game_interface[4]
 
         print(df)
         # Save the DataFrame back to the CSV file
         df.to_csv('database.csv', index=False)
 
         # Update the list of video games in memory
-        for o in l_VideoGame:
-            if o.ID == game_id:
-                o.setName(t_row_VideogameInterfaz[1])
-                o.setPlatform(t_row_VideogameInterfaz[2])
-                o.setHours(t_row_VideogameInterfaz[3])
-                o.setProgress(t_row_VideogameInterfaz[4])
+        for o in l_video_game:
+            if o.id == game_id:
+                o.set_name(t_row_video_game_interface[1])
+                o.set_platform(t_row_video_game_interface[2])
+                o.set_hours(t_row_video_game_interface[3])
+                o.set_progress(t_row_video_game_interface[4])
                 o.erased = False  # Make sure the 'erased' state is set to False
                 break
     else:
         print("Error: No video game with the provided ID was found.")
 
 # Function to handle the event of adding a video game
-def handle_add_event(event, values, l_VideoGame, table_data, window):
+def handle_add_event(event, values, l_video_game, table_data, window):
     valid = False
-    if re.match(pattern_platform, values['-Platform-']):
-        if re.match(pattern_ID, values['-ID-']):
-            if re.match(pattern_progress, values['-Progress-']):
+    if re.match(pattern_platform, values['-platform-']):
+        if re.match(pattern_id, values['-id-']):
+            if re.match(pattern_progress, values['-progress-']):
                 valid = True
     if valid:
-        addVideoGame(l_VideoGame, table_data,
-                     VideoGame(values['-ID-'], values['-Name-'], values['-Platform-'], values['-Hours-'],
-                               values['-Progress-'], -1), window)
+        add_video_game(l_video_game, table_data,
+                     VideoGame(values['-id-'], values['-name-'], values['-platform-'], values['-hours-'],
+                               values['-progress-'], -1), window)
         window['-Table-'].update(table_data)
 
 # Function to handle the event of deleting a video game
-def handle_delete_event(event, values, l_VideoGame, table_data, window):
+def handle_delete_event(event, values, l_video_game, table_data, window):
     if len(values['-Table-']) > 0:
-        delVideoGame(l_VideoGame, table_data, values['-Table-'][0])
+        del_video_game(l_video_game, table_data, values['-Table-'][0])
         window['-Table-'].update(table_data)
 
 # Function to handle the event of modifying a video game
-def handle_modify_event(event, values, l_VideoGame, table_data, window):
+def handle_modify_event(event, values, l_video_game, table_data, window):
     valid = False
-    if re.match(pattern_platform, values['-Platform-']):
-        if re.match(pattern_ID, values['-ID-']):
-            if re.match(pattern_progress, values['-Progress-']):
+    if re.match(pattern_platform, values['-platform-']):
+        if re.match(pattern_id, values['-id-']):
+            if re.match(pattern_progress, values['-progress-']):
                 valid = True
     if valid:
         row_to_update = None
         for t in table_data:
-            if str(t[0]) == values['-ID-']:
+            if str(t[0]) == values['-id-']:
                 row_to_update = t
-                t[1], t[2], t[3], t[4] = values['-Name-'], values['-Platform-'], values['-Hours-'], values['-Progress-']
+                t[1], t[2], t[3], t[4] = values['-name-'], values['-platform-'], values['-hours-'], values['-progress-']
                 break
         if row_to_update is None:
             print("Error: No video game with the provided ID was found in the event.")
             return
-        updateVideoGame(l_VideoGame, row_to_update, int(values['-PosFile-']))
+        update_video_game(l_video_game, row_to_update, int(values['-pos_file-']))
         window['-Table-'].update(table_data)
-        window['-ID-'].update(disabled=False)
+        window['-id-'].update(disabled=False)
 
 # Function to sort the table by multiple columns
 def sort_table(table, cols):
@@ -144,25 +145,26 @@ def interface():
     font1, font2 = ('Arial', 14), ('Arial', 16)
     sg.theme('Purple')
     sg.set_options(font=font1)
-    table_data=[]
+    table_data = []
     row_to_update = []
-    l_VideoGame = readVideoGame('database.csv')
+    l_video_game = read_video_game('database.csv')
     # Fill the data list for the table
-    for o in l_VideoGame:
-        table_data.append([o.ID, o.name, o.platform, o.hours, o.progress, o.posFile, o.erased])
+    for o in l_video_game:
+        table_data.append([o.id, o.name, o.platform, o.hours, o.progress, o.pos_file, o.erased])
 
     # Definition of the interface layout
     layout = [
                  [sg.Push(), sg.Text('My VideoGame Library'), sg.Push()]] + [
                  [sg.Text(text), sg.Push(), sg.Input(key=key)] for key, text in VideoGame.fields.items()] + [
                  [sg.Push()] +
-                 [sg.Button(button) for button in ('Add', 'Delete','Modify','Clear')] +
+                 [sg.Button(button) for button in ('Add', 'Delete', 'Modify', 'Clear')] +
                  [sg.Push()],
                  [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50, num_rows=10,
-                           display_row_numbers=False, justification='center', enable_events=True, enable_click_events=True,
+                           display_row_numbers=False, justification='center', enable_events=True,
+                           enable_click_events=True,
                            vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
-                           expand_x=True,bind_return_key=True, key='-Table-')],
-                 [sg.Button('Purge'), sg.Push(),sg.Button('Sort File')],
+                           expand_x=True, bind_return_key=True, key='-Table-')],
+                 [sg.Button('Purge'), sg.Push(), sg.Button('Sort File')],
                  ]
     sg.theme('DarkBlue4')
     # Create the PySimpleGUI window
@@ -180,37 +182,37 @@ def interface():
 
         # Handle the event of adding a video game
         if event == 'Add':
-            handle_add_event(event, values, l_VideoGame, table_data, window)
+            handle_add_event(event, values, l_video_game, table_data, window)
 
         # Handle the event of deleting a video game
         if event == 'Delete':
-            handle_delete_event(event, values, l_VideoGame, table_data, window)
+            handle_delete_event(event, values, l_video_game, table_data, window)
 
         # Handle the event of double-clicking on the table
         if event == '-Table- Double':
             if len(values['-Table-']) > 0:
                 row = values['-Table-'][0]
-                window['-ID-'].update(disabled=True)
-                window['-ID-'].update(str(table_data[row][0]))
-                window['-Name-'].update(str(table_data[row][1]))
-                window['-Platform-'].update(str(table_data[row][2]))
-                window['-Hours-'].update(str(table_data[row][3]))
-                window['-Progress-'].update(str(table_data[row][4]))
-                window['-PosFile-'].update(str(table_data[row][5]))
+                window['-id-'].update(disabled=True)
+                window['-id-'].update(str(table_data[row][0]))
+                window['-name-'].update(str(table_data[row][1]))
+                window['-platform-'].update(str(table_data[row][2]))
+                window['-hours-'].update(str(table_data[row][3]))
+                window['-progress-'].update(str(table_data[row][4]))
+                window['-pos_file-'].update(str(table_data[row][5]))
 
         # Handle the event of clearing fields
         if event == 'Clear':
-            window['-ID-'].update(disabled=False)
-            window['-ID-'].update('')
-            window['-Name-'].update('')
-            window['-Platform-'].update('')
-            window['-Hours-'].update('')
-            window['-Progress-'].update('')
-            window['-PosFile-'].update('')
+            window['-id-'].update(disabled=False)
+            window['-id-'].update('')
+            window['-name-'].update('')
+            window['-platform-'].update('')
+            window['-hours-'].update('')
+            window['-progress-'].update('')
+            window['-pos_file-'].update('')
 
         # Handle the event of modifying a video game
         if event == 'Modify':
-            handle_modify_event(event, values, l_VideoGame, table_data, window)
+            handle_modify_event(event, values, l_video_game, table_data, window)
 
         # Handle the event of clicking on the table to sort
         if isinstance(event, tuple):

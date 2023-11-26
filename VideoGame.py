@@ -1,38 +1,44 @@
 class VideoGame:
+    # Class variables
     headings = ['ID', 'Name', 'Platform', 'Hours', 'Progress']
     fields = {
-        '-ID-': 'VideoGame ID:',
-        '-Name-': 'VideoGame Name:',
-        '-Platform-': 'Platform:',
-        '-Hours-': 'Hours:',
-        '-Progress-': 'Progress:',
-        '-PosFile-': 'Position into File'
+        '-id-': 'VideoGame ID:',
+        '-name-': 'VideoGame Name:',
+        '-platform-': 'Platform:',
+        '-hours-': 'Hours:',
+        '-progress-': 'Progress:',
+        '-pos_file-': 'Position into File'
     }
 
-    # El método __init__ es llamado al crear el objeto
-    def __init__(self, ID, name, platform, hours, progress, posFile, erased=False):
-        # Atributos de instancia
-        self.ID = ID
+    # Constructor method
+    def __init__(self, id, name, platform, hours, progress, pos_file, erased=False):
+        # Instance attributes
+        self.id = id
         self.name = name
         self.platform = platform
         self.hours = hours
         self.progress = progress
-        self.posFile = posFile
+        self.pos_file = pos_file
         self.erased = erased
 
-    def __eq__(self, oC):
-        return oC.posFile == self.posFile
+    # Equality comparison method
+    def __eq__(self, other):
+        return other.pos_file == self.pos_file
 
+    # String representation method
     def __str__(self):
-        return str(self.ID) + str(self.name) + str(self.platform) + str(self.hours) + str(self.progress) + str(
-            self.posFile)
+        return (
+                str(self.id) + str(self.name) + str(self.platform) +
+                str(self.hours) + str(self.progress) + str(self.pos_file)
+        )
 
-    def videoGameinPos(self, pos):
-        return self.posFile == pos
+    # Method to check if the video game is in a specific position
+    def video_game_in_pos(self, pos):
+        return self.pos_file == pos
 
-    def setVideoGame(self, name, platform, hours, progress):
+    # Method to set video game attributes
+    def set_video_game(self, name, platform, hours, progress):
         self.name = name
         self.platform = platform
         self.hours = hours
         self.progress = progress
-
