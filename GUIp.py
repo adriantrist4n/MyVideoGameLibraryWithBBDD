@@ -148,36 +148,59 @@ def interface():
     table_data = []
     row_to_update = []
     l_video_game = read_video_game('database.csv')
+
     # Fill the data list for the table
     for o in l_video_game:
         table_data.append([o.id, o.name, o.platform, o.hours, o.progress, o.pos_file, o.erased])
 
     # Definition of the interface layout
-    layout = [
-                 [sg.Push(), sg.Text('My VideoGame Library'), sg.Push()]] + [
-                 [sg.Text(text), sg.Push(), sg.Input(key=key)] for key, text in VideoGame.fields.items()] + [
-                 [sg.Push()] +
-                 [sg.Button(button) for button in ('Add', 'Delete', 'Modify', 'Clear')] +
-                 [sg.Push()],
-                 [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50, num_rows=10,
-                           display_row_numbers=False, justification='center', enable_events=True,
-                           enable_click_events=True,
-                           vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
-                           expand_x=True, bind_return_key=True, key='-Table-')],
-                 [sg.Button('Purge'), sg.Push(), sg.Button('Sort File')],
-                 ]
-    sg.theme('DarkBlue4')
-    # Create the PySimpleGUI window
-    window = sg.Window('My VideoGame Library', layout, finalize=True)
+    input_layout = [
+        [sg.Text(text), sg.Input(key=key)] for key, text in VideoGame.fields.items()
+    ]
 
+    button_layout = [
+        sg.Button(button) for button in ('Add', 'Delete', 'Modify', 'Clear')
+    ]
+
+    # Organize the elements in columns
+    left_column = [
+        [sg.Text('My VideoGame Library')],
+        *input_layout,
+        button_layout
+    ]
+
+    right_column = [
+        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50, num_rows=10,
+                  display_row_numbers=False, justification='center', enable_events=True,
+                  enable_click_events=True,
+                  vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
+                  expand_x=True, bind_return_key=True, key='-Table-')],
+        [sg.Button('Purge'), sg.Button('Sort File')],
+    ]
+
+    layout = [
+        [
+            sg.Column(left_column),
+            sg.Column(right_column),
+        ],
+    ]
+
+    sg.theme('DarkBlue4')
+
+    # Define the size of the window
+    window_size = (1250, 350)
+
+    # Create the PySimpleGUI window
+    window = sg.Window('My VideoGame Library', layout, size=window_size, finalize=True)
+
+    # Binds the event for double-clicking on the table
     window['-Table-'].bind("<Double-Button-1>", " Double")
 
     # Main loop to handle interface events
     while True:
         event, values = window.read()
 
-        # Handle the event of closing the window
-        if event == sg.WIN_CLOSED:
+        if event == sg.WINDOW_CLOSED:
             break
 
         # Handle the event of adding a video game
@@ -224,6 +247,7 @@ def interface():
 
     # Close the window when exiting the loop
     window.close()
+
 
 # Call the main function
 interface()
