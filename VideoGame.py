@@ -40,3 +40,19 @@ class VideoGame:
         self.platform = platform
         self.hours = hours
         self.progress = progress
+
+    # Method to set the name attribute
+    def set_name(self, name):
+        self.name = name
+
+    # Method to set the platform attribute
+    def set_platform(self, platform):
+        self.platform = platform
+
+    # Method to set the hours attribute
+    def set_hours(self, hours):
+        self.hours = hours
+
+    # Method to set the progress attribute
+    def set_progress(self, progress):
+        self.progress = progress
