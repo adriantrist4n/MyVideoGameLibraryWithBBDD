@@ -9,7 +9,6 @@ def save_video_game(csv_filename, video_game):
         "platform": [video_game.platform],
         "hours": [video_game.hours],
         "progress": [video_game.progress],
-        "pos_file": [video_game.pos_file],
         "erased": [video_game.erased]
     }
     df = pd.DataFrame(video_game_data)
@@ -25,7 +24,7 @@ def modify_video_game(csv_filename, video_game):
     mask = df['id'] == video_game.id
 
     # Update the values in the identified row
-    df.loc[mask, ['id', 'name', 'platform', 'hours', 'progress', 'pos_file']] = [video_game.id, video_game.name, video_game.platform, video_game.hours, video_game.progress, video_game.pos_file]
+    df.loc[mask, ['id', 'name', 'platform', 'hours', 'progress']] = [video_game.id, video_game.name, video_game.platform, video_game.hours, video_game.progress]
 
     # Save the updated DataFrame back to the CSV file
     df.to_csv(csv_filename, index=False)
@@ -42,7 +41,7 @@ def read_video_game(csv_filename):
         return []
 
     video_game_list = []
-    expected_columns = ['id', 'name', 'platform', 'hours', 'progress', 'pos_file', 'erased']
+    expected_columns = ['id', 'name', 'platform', 'hours', 'progress', 'erased']
 
     # Check the existence of expected columns
     missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -52,6 +51,6 @@ def read_video_game(csv_filename):
 
     for index, row in df.iterrows():
         if row['erased'] is False:  # Only add to the list if 'erased' is False
-            video_game_list.append(VideoGame(row['id'], row['name'], row['platform'], row['hours'], row['progress'], row['pos_file'], row['erased']))
+            video_game_list.append(VideoGame(row['id'], row['name'], row['platform'], row['hours'], row['progress'], row['erased']))
 
     return video_game_list

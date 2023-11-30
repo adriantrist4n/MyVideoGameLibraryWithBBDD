@@ -1,8 +1,2 @@
-id,name,platform,hours,progress,pos_file,erased
-1,Elden Ring,PC,55,33%,-1,True
-2,Marvel: Spicerman,PC,23,100%,-1,True
-2,ads,PS,99,82%,-1,True
-2,adsdf,PS,99,82%,-1,True
-2,ad,PC,25,100%,-1,True
-952,Resident Evil ,PC,12,22%,-1,False
-999,Cyberpunk 2077,PC,240,112%,-1,False
+id,name,platform,hours,progress,erased
+777,Resident Evil 5,PC,22,100%,False

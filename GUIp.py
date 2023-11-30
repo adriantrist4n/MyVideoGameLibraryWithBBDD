@@ -28,9 +28,7 @@ pattern_progress = r"\d+%$"
 def add_video_game(l_video_game, t_video_game_interface, o_video_game, window):
     save_video_game('database.csv', o_video_game)
     l_video_game.append(o_video_game)  # Add the VideoGame object to the list
-    o_video_game.pos_file = len(l_video_game) - 1
-    t_video_game_interface.append([o_video_game.id, o_video_game.name, o_video_game.platform, o_video_game.hours, o_video_game.progress,
-                                   o_video_game.pos_file, o_video_game.erased])
+    t_video_game_interface.append([o_video_game.id, o_video_game.name, o_video_game.platform, o_video_game.hours, o_video_game.progress, o_video_game.erased])
     window['-Table-'].update(values=t_video_game_interface)
 
 # Function to delete a video game from the list and update the interface and CSV file
@@ -57,7 +55,7 @@ def del_video_game(l_video_game, t_video_game_interface, pos_in_table):
     t_video_game_interface.remove(t_video_game_interface[pos_in_table])
 
 # Function to update a video game in the list and the CSV file
-def update_video_game(l_video_game, t_row_video_game_interface, pos_in_file):
+def update_video_game(l_video_game, t_row_video_game_interface):
     # Read the CSV file and store the data in a DataFrame
     df = pd.read_csv('database.csv')
 
@@ -75,7 +73,6 @@ def update_video_game(l_video_game, t_row_video_game_interface, pos_in_file):
         df.loc[mask, 'hours'] = t_row_video_game_interface[3]
         df.loc[mask, 'progress'] = t_row_video_game_interface[4]
 
-        print(df)
         # Save the DataFrame back to the CSV file
         df.to_csv('database.csv', index=False)
 
@@ -100,8 +97,7 @@ def handle_add_event(event, values, l_video_game, table_data, window):
                 valid = True
     if valid:
         add_video_game(l_video_game, table_data,
-                     VideoGame(values['-id-'], values['-name-'], values['-platform-'], values['-hours-'],
-                               values['-progress-'], -1), window)
+                       VideoGame(values['-id-'], values['-name-'], values['-platform-'], values['-hours-'], values['-progress-'], False), window)
         window['-Table-'].update(table_data)
 
 # Function to handle the event of deleting a video game
@@ -127,7 +123,7 @@ def handle_modify_event(event, values, l_video_game, table_data, window):
         if row_to_update is None:
             print("Error: No video game with the provided ID was found in the event.")
             return
-        update_video_game(l_video_game, row_to_update, int(values['-pos_file-']))
+        update_video_game(l_video_game, row_to_update)
         window['-Table-'].update(table_data)
         window['-id-'].update(disabled=False)
 
@@ -142,53 +138,57 @@ def sort_table(table, cols):
 
 # Main function that defines the graphical interface and handles events
 def interface():
+    sg.theme('DarkBlue')
+
     font1, font2 = ('Arial', 14), ('Arial', 16)
-    sg.theme('Purple')
     sg.set_options(font=font1)
-    table_data = []
-    row_to_update = []
     l_video_game = read_video_game('database.csv')
 
     # Fill the data list for the table
-    for o in l_video_game:
-        table_data.append([o.id, o.name, o.platform, o.hours, o.progress, o.pos_file, o.erased])
+    table_data = [
+        [o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game
+    ]
 
     # Definition of the interface layout
     input_layout = [
-        [sg.Text(text), sg.Input(key=key)] for key, text in VideoGame.fields.items()
+        [sg.Text(text, size=(15, 1)), sg.Input(key=key, size=(29, 1))] for key, text in VideoGame.fields.items()
     ]
 
-    button_layout = [
-        sg.Button(button) for button in ('Add', 'Delete', 'Modify', 'Clear')
+    button_layout_row1 = [
+        sg.Button('Add', size=(10, 1)),
+        sg.Button('Delete', size=(10, 1)),
+        sg.Button('Modify', size=(10, 1)),
+        sg.Button('Clear', size=(10, 1)),
+    ]
+
+    button_layout_row2 = [
+        sg.Button('Purge', size=(22, 1)),
+        sg.Button('Sort File', size=(21, 1))
     ]
 
     # Organize the elements in columns
     left_column = [
-        [sg.Text('My VideoGame Library')],
+        [sg.Text('My VideoGame Library', font=font2, justification='center', size=(35, 1))],
         *input_layout,
-        button_layout
+        button_layout_row1,
+        button_layout_row2
     ]
 
     right_column = [
-        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50, num_rows=10,
+        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50,
                   display_row_numbers=False, justification='center', enable_events=True,
                   enable_click_events=True,
                   vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
-                  expand_x=True, bind_return_key=True, key='-Table-')],
-        [sg.Button('Purge'), sg.Button('Sort File')],
+                  expand_x=True, bind_return_key=True, key='-Table-', auto_size_columns=True,
+                  size=(800, 400))],
     ]
 
     layout = [
-        [
-            sg.Column(left_column),
-            sg.Column(right_column),
-        ],
+        [sg.Column(left_column), sg.Column(right_column)],
     ]
 
-    sg.theme('DarkBlue4')
-
     # Define the size of the window
-    window_size = (1250, 350)
+    window_size = (1050, 550)
 
     # Create the PySimpleGUI window
     window = sg.Window('My VideoGame Library', layout, size=window_size, finalize=True)
@@ -221,7 +221,6 @@ def interface():
                 window['-platform-'].update(str(table_data[row][2]))
                 window['-hours-'].update(str(table_data[row][3]))
                 window['-progress-'].update(str(table_data[row][4]))
-                window['-pos_file-'].update(str(table_data[row][5]))
 
         # Handle the event of clearing fields
         if event == 'Clear':
@@ -231,7 +230,6 @@ def interface():
             window['-platform-'].update('')
             window['-hours-'].update('')
             window['-progress-'].update('')
-            window['-pos_file-'].update('')
 
         # Handle the event of modifying a video game
         if event == 'Modify':
@@ -248,8 +246,5 @@ def interface():
     # Close the window when exiting the loop
     window.close()
 
-
 # Call the main function
 interface()
-
-# Close the file at the end of the program

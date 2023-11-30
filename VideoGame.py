@@ -6,35 +6,33 @@ class VideoGame:
         '-name-': 'VideoGame Name:',
         '-platform-': 'Platform:',
         '-hours-': 'Hours:',
-        '-progress-': 'Progress:',
-        '-pos_file-': 'Position into File'
+        '-progress-': 'Progress:'
     }
 
     # Constructor method
-    def __init__(self, id, name, platform, hours, progress, pos_file, erased=False):
+    def __init__(self, id, name, platform, hours, progress, erased=False):
         # Instance attributes
         self.id = id
         self.name = name
         self.platform = platform
         self.hours = hours
         self.progress = progress
-        self.pos_file = pos_file
         self.erased = erased
 
     # Equality comparison method
     def __eq__(self, other):
-        return other.pos_file == self.pos_file
+        return other.id == self.id  # Adjust the comparison based on your needs
 
     # String representation method
     def __str__(self):
         return (
-                str(self.id) + str(self.name) + str(self.platform) +
-                str(self.hours) + str(self.progress) + str(self.pos_file)
+            f"ID: {self.id}, Name: {self.name}, Platform: {self.platform}, "
+            f"Hours: {self.hours}, Progress: {self.progress}"
         )
 
     # Method to check if the video game is in a specific position
     def video_game_in_pos(self, pos):
-        return self.pos_file == pos
+        return False  # No pos_file attribute; adjust the logic accordingly
 
     # Method to set video game attributes
     def set_video_game(self, name, platform, hours, progress):
