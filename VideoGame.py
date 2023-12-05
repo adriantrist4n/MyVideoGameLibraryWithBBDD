@@ -1,6 +1,6 @@
 class VideoGame:
     # Class variables
-    headings = ['ID', 'Name', 'Platform', 'Hours', 'Progress']
+    headings = ['id', 'name', 'platform', 'hours', 'progress', 'erased']
     fields = {
         '-id-': 'VideoGame ID:',
         '-name-': 'VideoGame Name:',

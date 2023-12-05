@@ -7,8 +7,8 @@
 # https://github.com/PySimpleGUI/PySimpleGUI/issues/5646
 # https://docs.python.org/3/howto/sorting.html
 
-
 # Import necessary modules
+import csv
 from VideoGame import *
 from SerializeFile import *
 import PySimpleGUI as sg
@@ -136,6 +136,28 @@ def sort_table(table, cols):
             sg.popup_error('Error in sort_table', 'Exception in sort_table', e)
     return table
 
+
+
+def purge_database(l_video_game, t_video_game_interface, window):
+    # Filter out the erased video games
+    filtered_video_games = [o for o in l_video_game if not o.erased]
+
+    # Create a new CSV file without erased records
+    with open('database.csv', 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        # Write the header
+        csv_writer.writerow(VideoGame.headings)
+        # Write the data
+        for o in filtered_video_games:
+            csv_writer.writerow([o.id, o.name, o.platform, o.hours, o.progress, o.erased])
+
+    # Update the list of video games in memory
+    l_video_game = filtered_video_games
+
+    # Update the table in the interface
+    t_video_game_interface = [[o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game]
+    window['-Table-'].update(values=t_video_game_interface)
+
 # Main function that defines the graphical interface and handles events
 def interface():
     sg.theme('DarkBlue')
@@ -174,8 +196,10 @@ def interface():
         button_layout_row2
     ]
 
+    table_headings = [heading for heading in VideoGame.headings if heading != 'erased']
+
     right_column = [
-        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=70,
+        [sg.Table(values=table_data, headings=table_headings, max_col_width=70,
                   display_row_numbers=False, justification='center', enable_events=True,
                   enable_click_events=True,
                   vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
@@ -234,6 +258,10 @@ def interface():
         # Handle the event of modifying a video game
         if event == 'Modify':
             handle_modify_event(event, values, l_video_game, table_data, window)
+
+        # Handle the event of purging the database
+        if event == 'Purge':
+            purge_database(l_video_game, table_data, window)
 
         # Handle the event of clicking on the table to sort
         if isinstance(event, tuple):
