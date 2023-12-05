@@ -20,8 +20,8 @@ import pandas as pd
 l_video_game = []
 
 # Definition of regular expression patterns for validation
-pattern_id = r"\d{3}"
-pattern_platform = r"^[A-Z]+$"
+pattern_id = r"\b[1-9]\d*\b"
+pattern_platform = r"^[A-Z0-9]+$"
 pattern_progress = r"\d+%$"
 
 # Function to add a new video game to the list and save the data to a CSV file
