@@ -68,10 +68,10 @@ def update_video_game(l_video_game, t_row_video_game_interface):
 
     # If such a row is found, update the values of that row with the new values of the video game
     if df.loc[mask].shape[0] > 0:
-        df.loc[mask, 'name'] = t_row_video_game_interface[1]
-        df.loc[mask, 'platform'] = t_row_video_game_interface[2]
-        df.loc[mask, 'hours'] = t_row_video_game_interface[3]
-        df.loc[mask, 'progress'] = t_row_video_game_interface[4]
+        df.loc[mask, 'name'] = str(t_row_video_game_interface[1])
+        df.loc[mask, 'platform'] = str(t_row_video_game_interface[2])
+        df.loc[mask, 'hours'] = int(t_row_video_game_interface[3])
+        df.loc[mask, 'progress'] = str(t_row_video_game_interface[4])
 
         # Save the DataFrame back to the CSV file
         df.to_csv('database.csv', index=False)
@@ -175,12 +175,12 @@ def interface():
     ]
 
     right_column = [
-        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=50,
+        [sg.Table(values=table_data, headings=VideoGame.headings, max_col_width=70,
                   display_row_numbers=False, justification='center', enable_events=True,
                   enable_click_events=True,
                   vertical_scroll_only=False, select_mode=sg.TABLE_SELECT_MODE_BROWSE,
                   expand_x=True, bind_return_key=True, key='-Table-', auto_size_columns=True,
-                  size=(800, 400))],
+                  size=(900, 650))],
     ]
 
     layout = [
@@ -188,7 +188,7 @@ def interface():
     ]
 
     # Define the size of the window
-    window_size = (1050, 550)
+    window_size = (1050, 600)
 
     # Create the PySimpleGUI window
     window = sg.Window('My VideoGame Library', layout, size=window_size, finalize=True)
