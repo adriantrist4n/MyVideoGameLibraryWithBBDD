@@ -180,6 +180,36 @@ def purge_database(l_video_game, t_video_game_interface, window):
     t_video_game_interface = [[o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game]
     window['-Table-'].update(values=t_video_game_interface)
 
+def sort_file(l_video_game, t_video_game_interface, window):
+    # New window to select the value to sort by
+    layout = ([[sg.Text('Select a value to sort by')],
+               [sg.Combo(['id', 'name', 'progress', 'hours'], key='-COMBO-', default_value='name')],
+               [sg.Button('OK')]])
+    sort_window = sg.Window('Sort File', layout)
+
+    while True:  # Event Loop
+        sort_event, sort_values = sort_window.read()
+        if sort_event == 'OK':
+            sort_window.close()
+
+            df = pd.read_csv('database.csv')
+
+            # Order the DataFrame by the selected value
+            df.sort_values(by=sort_values['-COMBO-'], inplace=True)
+
+            # Write the sorted DataFrame back to the CSV file
+            df.to_csv('database.csv', index=False)
+
+            # Update the table in the interface
+            l_video_game = read_video_game('database.csv')
+            t_video_game_interface = [[o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game]
+            window['-Table-'].update(values=t_video_game_interface)
+            break
+        elif sort_event == sg.WIN_CLOSED:
+            break
+        else:
+            break
+
 # Main function that defines the graphical interface and handles events
 def interface():
     sg.theme('DarkBlue')
@@ -284,6 +314,9 @@ def interface():
         # Handle the event of purging the database
         if event == 'Purge':
             purge_database(l_video_game, table_data, window)
+
+        if event == 'Sort File':
+            sort_file(l_video_game, table_data, window)
 
         # Handle the event of clicking on the table to sort
         if isinstance(event, tuple):
