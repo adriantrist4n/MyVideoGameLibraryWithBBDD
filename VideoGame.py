@@ -30,6 +30,7 @@ class VideoGame:
             f"Hours: {self.hours}, Progress: {self.progress}"
         )
 
+
     # Method to check if the video game is in a specific position
     def video_game_in_pos(self, pos):
         return False  # No pos_file attribute; adjust the logic accordingly

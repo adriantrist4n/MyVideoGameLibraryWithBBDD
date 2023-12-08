@@ -43,6 +43,7 @@ def read_video_game(csv_filename):
     video_game_list = []
     expected_columns = ['id', 'name', 'platform', 'hours', 'progress', 'erased']
 
+
     # Check the existence of expected columns
     missing_columns = [col for col in expected_columns if col not in df.columns]
     if missing_columns:
