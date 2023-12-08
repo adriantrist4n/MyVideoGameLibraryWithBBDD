@@ -9,7 +9,6 @@
 
 # Import necessary modules
 import csv
-from VideoGame import *
 from SerializeFile import *
 import PySimpleGUI as sg
 import re
@@ -91,13 +90,28 @@ def update_video_game(l_video_game, t_row_video_game_interface):
 # Function to handle the event of adding a video game
 def handle_add_event(event, values, l_video_game, table_data, window):
     valid = False
-    if re.match(pattern_platform, values['-platform-']):
-        if re.match(pattern_id, values['-id-']):
-            if re.match(pattern_progress, values['-progress-']):
-                valid = True
+
+    # Check if the ID is unique
+    new_game_id = values['-id-']
+    if new_game_id not in [str(o.id) for o in l_video_game]:
+        if re.match(pattern_platform, values['-platform-']):
+            if re.match(pattern_id, new_game_id):
+
+                if re.match(pattern_progress, values['-progress-']):
+                    valid = True
+                else:
+                    sg.popup_error('Invalid input', 'At the end of the progress it takes %')
+            else:
+                sg.popup_error('Invalid input', 'Invalid ID format')
+        else:
+            sg.popup_error('Invalid input', 'Invalid platform format (All in capital letters)')
+
+    else:
+        sg.popup_error('Invalid input', 'Please make sure the ID is unique')
+
     if valid:
         add_video_game(l_video_game, table_data,
-                       VideoGame(values['-id-'], values['-name-'], values['-platform-'], values['-hours-'], values['-progress-'], False), window)
+                       VideoGame(new_game_id, values['-name-'], values['-platform-'], values['-hours-'], values['-progress-'], False), window)
         window['-Table-'].update(table_data)
 
 # Function to handle the event of deleting a video game
@@ -109,10 +123,18 @@ def handle_delete_event(event, values, l_video_game, table_data, window):
 # Function to handle the event of modifying a video game
 def handle_modify_event(event, values, l_video_game, table_data, window):
     valid = False
+
     if re.match(pattern_platform, values['-platform-']):
         if re.match(pattern_id, values['-id-']):
             if re.match(pattern_progress, values['-progress-']):
                 valid = True
+            else:
+                sg.popup_error('Invalid input', 'At the end of the progress it takes %')
+        else:
+            sg.popup_error('Invalid input', 'Invalid ID format')
+    else:
+        sg.popup_error('Invalid input', 'Invalid platform format (All in capital letters)')
+
     if valid:
         row_to_update = None
         for t in table_data:
