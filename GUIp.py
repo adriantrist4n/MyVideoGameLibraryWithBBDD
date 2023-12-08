@@ -20,8 +20,6 @@ l_video_game = []
 
 # Definition of regular expression patterns for validation
 pattern_id = r"\b[1-9]\d*\b"
-pattern_platform = r"^[A-Z0-9]+$"
-pattern_progress = r"\d+%$"
 
 # Function to add a new video game to the list and save the data to a CSV file
 def add_video_game(l_video_game, t_video_game_interface, o_video_game, window):
@@ -94,17 +92,11 @@ def handle_add_event(event, values, l_video_game, table_data, window):
     # Check if the ID is unique
     new_game_id = values['-id-']
     if new_game_id not in [str(o.id) for o in l_video_game]:
-        if re.match(pattern_platform, values['-platform-']):
             if re.match(pattern_id, new_game_id):
-
-                if re.match(pattern_progress, values['-progress-']):
                     valid = True
-                else:
-                    sg.popup_error('Invalid input', 'At the end of the progress it takes %')
             else:
                 sg.popup_error('Invalid input', 'Invalid ID format')
-        else:
-            sg.popup_error('Invalid input', 'Invalid platform format (All in capital letters)')
+
 
     else:
         sg.popup_error('Invalid input', 'Please make sure the ID is unique')
@@ -124,23 +116,18 @@ def handle_delete_event(event, values, l_video_game, table_data, window):
 def handle_modify_event(event, values, l_video_game, table_data, window):
     valid = False
 
-    if re.match(pattern_platform, values['-platform-']):
-        if re.match(pattern_id, values['-id-']):
-            if re.match(pattern_progress, values['-progress-']):
-                valid = True
-            else:
-                sg.popup_error('Invalid input', 'At the end of the progress it takes %')
-        else:
-            sg.popup_error('Invalid input', 'Invalid ID format')
+    if re.match(pattern_id, values['-id-']):
+        valid = True
     else:
-        sg.popup_error('Invalid input', 'Invalid platform format (All in capital letters)')
+        sg.popup_error('Invalid input', 'Invalid ID format')
+
 
     if valid:
         row_to_update = None
         for t in table_data:
             if str(t[0]) == values['-id-']:
                 row_to_update = t
-                t[1], t[2], t[3], t[4] = values['-name-'], values['-platform-'], values['-hours-'], values['-progress-']
+                t[1], t[2], t[3], t[4] = values['-name-'], values['-platform-'], int(values['-hours-']), values['-progress-']
                 break
         if row_to_update is None:
             print("Error: No video game with the provided ID was found in the event.")
@@ -181,10 +168,13 @@ def purge_database(l_video_game, t_video_game_interface, window):
     window['-Table-'].update(values=t_video_game_interface)
 
 def sort_file(l_video_game, t_video_game_interface, window):
-    # New window to select the value to sort by
-    layout = ([[sg.Text('Select a value to sort by')],
-               [sg.Combo(['id', 'name', 'progress', 'hours'], key='-COMBO-', default_value='name')],
-               [sg.Button('OK')]])
+    # New window to select the value and order to sort by
+    layout = [
+        [sg.Text('Select a value to sort by')],
+        [sg.Combo(['id', 'name', 'progress', 'hours'], key='-COMBO-', default_value='name')],
+        [sg.Radio('Ascending', 'RADIO1', key='-ASC-', default=True), sg.Radio('Descending', 'RADIO1', key='-DESC-')],
+        [sg.Button('OK')]
+    ]
     sort_window = sg.Window('Sort File', layout)
 
     while True:  # Event Loop
@@ -194,8 +184,11 @@ def sort_file(l_video_game, t_video_game_interface, window):
 
             df = pd.read_csv('database.csv')
 
-            # Order the DataFrame by the selected value
-            df.sort_values(by=sort_values['-COMBO-'], inplace=True)
+            # Determine the sort order based on the selected radio button
+            ascending_order = sort_values['-ASC-']
+
+            # Order the DataFrame by the selected value and order
+            df.sort_values(by=sort_values['-COMBO-'], ascending=ascending_order, inplace=True)
 
             # Write the sorted DataFrame back to the CSV file
             df.to_csv('database.csv', index=False)
@@ -223,9 +216,14 @@ def interface():
         [o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game
     ]
 
+    platform_options = ['Play', 'Xbox', 'PC', 'Nintendo']
+
     # Definition of the interface layout
     input_layout = [
-        [sg.Text(text, size=(15, 1)), sg.Input(key=key, size=(29, 1))] for key, text in VideoGame.fields.items()
+        [sg.Text(text, size=(15, 1)), sg.Input(key=key, size=(29, 1))] if key != '-progress-' and key != '-platform-' else
+        [sg.Text('Progress:', size=(15, 1)), sg.Slider(range=(0, 100), orientation='h', size=(25, 20), key='-progress-')] if key == '-progress-' else
+        [sg.Text('Platform:', size=(15, 1)), sg.Combo(platform_options, key='-platform-', size=(28, 1))]
+        for key, text in VideoGame.fields.items()
     ]
 
     button_layout_row1 = [
