@@ -146,7 +146,7 @@ def sort_table(table, cols):
     return table
 
 
-
+# Function to purge the database.csv
 def purge_database(l_video_game, t_video_game_interface, window):
     # Filter out the erased video games
     filtered_video_games = [o for o in l_video_game if not o.erased]
@@ -167,6 +167,7 @@ def purge_database(l_video_game, t_video_game_interface, window):
     t_video_game_interface = [[o.id, o.name, o.platform, o.hours, o.progress, o.erased] for o in l_video_game]
     window['-Table-'].update(values=t_video_game_interface)
 
+# Function to sort database.csv
 def sort_file(l_video_game, t_video_game_interface, window):
     # New window to select the value and order to sort by
     layout = [
@@ -303,7 +304,7 @@ def interface():
             window['-name-'].update('')
             window['-platform-'].update('')
             window['-hours-'].update('')
-            window['-progress-'].update('')
+            window['-progress-'].update(0)
 
         # Handle the event of modifying a video game
         if event == 'Modify':
