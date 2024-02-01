@@ -10,8 +10,7 @@ class VideoGame:
     }
 
     # Constructor method
-    def __init__(self, id, name, platform, hours, progress, erased=False):
-        # Instance attributes
+    def __init__(self, name, platform, hours, progress, erased=False, id=None):
         self.id = id
         self.name = name
         self.platform = platform
