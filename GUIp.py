@@ -1,15 +1,28 @@
 from SerializeFile import *
 import PySimpleGUI as sg
 import operator
+import re
 
+# Lista para almacenar los videojuegos
 l_video_game = []
 
+
+def is_number(string):
+    # Función que verifica si la cadena contiene solo números
+    return re.match(r'^\d+$', string) is not None
+
+
 def handle_add_event(values, l_video_game, table_data, window):
+    # Maneja el evento de añadir un videojuego
     name = values['-name-']
     platform = values['-platform-']
     hours = values['-hours-']
+    if not is_number(hours):
+        sg.popup_error('Please enter a valid number for hours.')
+        return
     progress = values['-progress-']
 
+    # Crea un objeto VideoGame y lo añade a la base de datos y a la tabla de la interfaz
     o_video_game = VideoGame(name=name, platform=platform, hours=hours, progress=progress, erased=False)
     add_video_game(l_video_game, table_data, o_video_game, window)
     window['-Table-'].update(table_data)
@@ -17,19 +30,27 @@ def handle_add_event(values, l_video_game, table_data, window):
 
 
 def handle_delete_event(values, l_video_game, table_data, window):
+    # Maneja el evento de eliminar un videojuego
     if len(values['-Table-']) > 0:
         del_video_game(l_video_game, table_data, values['-Table-'][0], window)
         window['-Table-'].update(table_data)
 
 def handle_modify_event(selected_row_index, values, l_video_game, table_data, window):
+    # Maneja el evento de modificar un videojuego
     if selected_row_index is not None:
+        hours = values['-hours-']
+        if not is_number(hours):
+            sg.popup_error('Please enter a valid number for hours.')
+            return  # Detener la ejecución si las horas no son un número válido
+
         current_game = l_video_game[selected_row_index]
 
-        update_video_game(current_game.id, values['-name-'], values['-platform-'], int(values['-hours-']), values['-progress-'])
+        # La conversión a int se hace después de validar que es un número
+        update_video_game(current_game.id, values['-name-'], values['-platform-'], int(hours), values['-progress-'])
 
         current_game.name = values['-name-']
         current_game.platform = values['-platform-']
-        current_game.hours = int(values['-hours-'])
+        current_game.hours = int(hours)  # Ya validamos que es un número
         current_game.progress = values['-progress-']
 
         table_data[selected_row_index] = [current_game.id, current_game.name, current_game.platform, current_game.hours, current_game.progress]
